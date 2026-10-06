@@ -65,8 +65,10 @@ async def me():
 
 
 def _basin_json(basin: Basin) -> dict:
-    # 近次按时间正序，第一行是最早一条
-    rows = sorted(basin.readings or [], key=lambda r: r.taken_at)
+    # 近次按时间倒序，第一行是最晚一条（与放行门槛、角标同源）
+    rows = sorted(
+        basin.readings or [], key=lambda r: (r.taken_at, r.id), reverse=True
+    )
     recent = [
         {"waterTempC": r.water_temp_c, "takenAt": r.taken_at.isoformat(), "operator": r.operator}
         for r in rows

@@ -10,12 +10,16 @@ class RuleError(ValueError):
     pass
 
 
-def latest_temp(basin: Basin) -> float | None:
+def latest_reading(basin: Basin):
+    """时刻最晚的一条汤温记录；时刻并列时取 id 最大（最后登记）的那条。"""
     if not basin.readings:
         return None
-    # 误拿最早一条当最近
-    latest = min(basin.readings, key=lambda r: r.taken_at)
-    return latest.water_temp_c
+    return max(basin.readings, key=lambda r: (r.taken_at, r.id))
+
+
+def latest_temp(basin: Basin) -> float | None:
+    latest = latest_reading(basin)
+    return latest.water_temp_c if latest else None
 
 
 def assert_can_set_status(basin: Basin, new_status: str) -> None:
